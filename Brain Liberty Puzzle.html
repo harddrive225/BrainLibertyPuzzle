@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head id="head1"></head>
+<body>
+<style>
+	#p1 {font-size: 36px; font-weight: 900;}
+	td {font-size: 26px; font-weight: 900; width: 50px; height: 50px; text-align: center;};
+</style>
+<p id="p1"></p>
+<table>
+<thead><tr><td id="square0data"></td><td id="square1data"></td><td id="square2data"></td><td id="square3data"></td></tr></thead>
+<tbody>
+	<tr><td id="square4data"></td><td id="square5data"></td><td id="square6data"></td><td id="square7data"></td></tr>
+	<tr><td id="square8data"></td><td id="square9data"></td><td id="square10data"></td><td id="square11data"></td></tr>
+	<tr><td id="square12data"></td><td id="square13data"></td><td id="square14data"></td><td id="square15data"></td></tr>
+</tbody>
+</table>
+<script type="text/javascript">
+	var squares = []; var score = 0; var highScore = 0;
+	function init() {
+		var startData = [];
+		setArray(squares, 16); setArray(startData,4);
+		startData[0] = sort16(); startData[1] = sort16(); startData[2] = Math.random(); startData[3] = Math.random();
+		while (startData[0] === startData[1]) { startData[1] = sort16() };
+		if (startData[2]<0.75){startData[2] = 2} else {startData[2] = 4};
+		if (startData[3]<0.75){startData[3] = 2} else {startData[3] = 4};
+		while (squares[startData[0]] > 0) {startData[0] = sort16();}
+		squares[startData[0]] = startData[2];
+		while (squares[startData[1]] > 0) {startData[1] = sort16();}
+		squares[startData[1]] = startData[3];
+		if (document.cookie === "") {setCookie("highScore", highScore, 2);}
+		else {var allCookies = document.cookie; var value = allCookies.split("=")[1]; highScore = value;}
+		score = 0; render();
+	};
+	function setCookie(name, value, exdays) {
+		var d = new Date();
+		d.setTime(d.getTime() + (exdays*24*60*60*1000));
+		var expires = "expires="+d.toUTCString();
+		document.cookie = name+"="+value+";"+expires+";path=/"
+	}
+	function sort16() {
+		var initNum = 0; initNum = Math.random();
+		for(i=1; i<=16; i+=1){if (i/16<initNum<(i+1)/16) {return i-1;};}; delete initNum;
+	};
+	function addSquare() {
+		var full = false;
+		for (i=0; i<16; i+=1) {if (squares[i] === 0) {full = false; break;}; full = true;};
+		if (full === false) {
+			var squareNum = sort16(); var squareValue = Math.random();
+			if (squareValue<0.75){squareValue = 2} else {squareValue = 4};
+			while (squares[squareNum] > 0) {squareNum = sort16();};
+			squares[squareNum] = squareValue;
+			delete squareNum; delete squareValue;
+		}
+		delete full;
+	} 
+	
+	function render() {
+		for(i=0; i<16;i+=1) {
+			document.getElementById("square"+i+"data").innerHTML = squares[i];
+			if(squares[i]===0){document.getElementById("square"+i+"data").style="background: lightgray; color: lightgray"}
+			if (squares[i]===2) {document.getElementById("square"+i+"data").style="background: #ff7b59"} //light red
+			if (squares[i]===4) {document.getElementById("square"+i+"data").style="background: #ff0000"} //red
+			if (squares[i]===8) {document.getElementById("square"+i+"data").style="background: #ffb66c"} //light orange
+			if (squares[i]===16) {document.getElementById("square"+i+"data").style="background: #ff5000"} //orange
+			if (squares[i]===32) {document.getElementById("square"+i+"data").style="background: #ffff6d"} //light yellow
+			if (squares[i]===64) {document.getElementById("square"+i+"data").style="background: #ffff00"} //yellow
+			if (squares[i]===128) {document.getElementById("square"+i+"data").style="background: #77bc65"} //light green
+			if (squares[i]===256) {document.getElementById("square"+i+"data").style="background: #008400"} //green
+			if (squares[i]===512) {document.getElementById("square"+i+"data").style="background: #00ffff"} //light blue
+			if (squares[i]===1024) {document.getElementById("square"+i+"data").style="background: #0000ff"} //blue
+			if (squares[i]===2048) {document.getElementById("square"+i+"data").style="background: #ff00ff"} //light purple
+			if (squares[i]===4096) {document.getElementById("square"+i+"data").style="background: #7c007c"} //purple
+			if (squares[i]===8192) {document.getElementById("square"+i+"data").style="background: #666666"} //dark gray
+		}
+		document.getElementById("p1").innerHTML = "";
+		document.getElementById("p1").innerHTML = "HIGH SCORE: " + highScore;
+		document.getElementById("p1").appendChild(document.createElement("br"));
+		document.getElementById("p1").innerHTML += "SCORE: " + score;
+	};
+
+	function setArray(arr,dimension) {for (i=0; i<dimension; i+=1){arr[i]=0;};};
+	
+	function keyboardHandler() {
+		document.addEventListener("keyup", (event) => {
+			var name = event.key; var code = event.code;
+			if (name === "ArrowUp" || name === "w") {slideUp();}
+			else if (name === "ArrowDown" || name === "s") {slideDown();}
+			else if (name === "ArrowLeft" || name === "a") {slideLeft();} 
+			else if (name === "ArrowRight" || name === "d") {slideRight();}
+		}, false);
+	}
+	
+	//RIGHT button
+	function slideRight() {
+		var startSquares = squares.join();
+		rowNum = 0;
+		for (j=0; j<4; j+=1){
+			var tempRow = [];
+			for (i=0; i<4; i+=1){
+				if(squares[rowNum*4+i] > 0) {
+					tempRow.push(squares[rowNum*4+i]);
+					squares[rowNum*4+i] = 0;
+				}
+			};
+			if (tempRow.length > 1){
+				for (i=1; i<=tempRow.length; i+=1){
+					if (tempRow[tempRow.length-i] === tempRow[tempRow.length-1-i]) {
+						tempRow[tempRow.length-1-i] = tempRow[tempRow.length-i] + tempRow[tempRow.length-1-i];
+						score += tempRow[tempRow.length-1-i];
+						tempRow.splice(tempRow.length-i,1);
+					}
+				}
+			};
+			for (k=0; k<4; k+=1){
+				if (tempRow.length > 0) {
+					squares[rowNum*4+3-k] = tempRow.pop();
+				}	
+			};
+			rowNum += 1;
+			tempRow = [];
+		};
+		var newSquares = squares.join();
+		if (startSquares !== newSquares){
+			addSquare();
+		};
+		delete rowNum; delete tempRow; delete startSquares; delete newSquares;
+		render(); testGameOver();
+	};
+	
+	//LEFT button
+	function slideLeft() {
+		var startSquares = squares.join();
+		rowNum = 0;
+		for (j=0; j<4; j+=1){
+			var tempRow = [];
+			for (i=0; i<4; i+=1){
+				if(squares[rowNum*4+i] > 0) {
+					tempRow.push(squares[rowNum*4+i]);
+					squares[rowNum*4+i] = 0;
+				}
+			};
+			if (tempRow.length > 1){
+				for (i=1; i<=tempRow.length; i+=1){
+					if (tempRow[i-1] === tempRow[i]) {
+						tempRow[i-1] = tempRow[i-1] + tempRow[i];
+						score += tempRow[i-1];
+						tempRow.splice(i,1);
+					}
+				}
+			};
+			for (k=0; k<4; k+=1){
+				if (tempRow.length > 0) {
+					squares[rowNum*4+k] = tempRow.shift();
+				}	
+			};
+			rowNum += 1;
+			tempRow = [];
+		};
+		var newSquares = squares.join();
+		if (startSquares !== newSquares){
+			addSquare();
+		};
+		delete rowNum; delete tempRow; delete startSquares; delete newSquares;
+		render(); testGameOver();
+	};
+
+	//UP button
+	function slideUp() {
+		var startSquares = squares.join();
+		itemNum = 0;
+		for (j=0; j<4; j+=1){
+			var tempRow = [];
+			for (i=0; i<4; i+=1){
+				if(squares[i*4+itemNum] > 0) {
+					tempRow.push(squares[i*4+itemNum]);
+					squares[i*4+itemNum] = 0;
+				}
+			};
+			if (tempRow.length > 1){
+				for (i=1; i<=tempRow.length; i+=1){
+					if (tempRow[i-1] === tempRow[i]) {
+						tempRow[i-1] = tempRow[i-1] + tempRow[i];
+						score += tempRow[i-1];
+						tempRow.splice(i,1);
+					}
+				}
+			};
+			for (k=0; k<4; k+=1){
+				if (tempRow.length > 0) {
+					squares[k*4+itemNum] = tempRow.shift();
+				}	
+			};
+			itemNum += 1;
+			tempRow = [];
+		};
+		var newSquares = squares.join();
+		if (startSquares !== newSquares){
+			addSquare();
+		};
+		delete itemNum; delete tempRow; delete startSquares; delete newSquares;
+		render(); testGameOver();
+	};
+	
+	//DOWN button
+	function slideDown() {
+		var startSquares = squares.join();
+		itemNum = 0;
+		for (j=0; j<4; j+=1){
+			var tempRow = [];
+			for (i=0; i<4; i+=1){
+				if(squares[i*4+itemNum] > 0) {
+					tempRow.push(squares[i*4+itemNum]);
+					squares[i*4+itemNum] = 0;
+				}
+			};
+			if (tempRow.length > 1){
+				for (i=1; i<=tempRow.length; i+=1){
+					if (tempRow[tempRow.length-i] === tempRow[tempRow.length-1-i]) {
+						tempRow[tempRow.length-1-i] = tempRow[tempRow.length-i] + tempRow[tempRow.length-1-i];
+						score += tempRow[tempRow.length-1-i];
+						tempRow.splice(tempRow.length-i,1);
+					}
+				}
+			};
+			for (k=0; k<4; k+=1){
+				if (tempRow.length > 0) {
+					squares[(3-k)*4+itemNum] = tempRow.pop();
+				}	
+			};
+			itemNum += 1;
+			tempRow = [];
+		};
+		var newSquares = squares.join();
+		if (startSquares !== newSquares){
+			addSquare();
+		};
+		delete itemNum; delete tempRow; delete startSquares; delete newSquares;
+		render(); testGameOver();
+	};
+	
+	function testGameOver() {
+		if (testZero() !== false) {
+			if (testCombineLR() !== false) {
+				if (testCombineUD() !== false) {
+					var newHigh = "";
+					if (score>highScore) {
+						highScore = score;
+						setCookie("highScore", highScore, 2000);
+						newHigh = "New high score! "
+					}
+					window.alert("Game Over! "+newHigh+"Your score is "+score);
+					squares = []; init();
+				}
+			}
+		}
+		function testZero() {
+			for (i=0; i<16; i+=1) {
+				if (squares[i] === 0) {return false;}
+			}
+		}
+		function testCombineLR() {
+			for (rowNum=0; rowNum<4; rowNum+=1) {
+				for (i=1; i<4; i+=1) {
+					if (squares[rowNum*4+(i-1)] === squares[rowNum*4+i]) {return false;}
+				}
+			}
+		}
+		function testCombineUD() {
+			for (itemNum=0; itemNum<4; itemNum+=1) {
+				for (i=0; i<3; i+=1){
+					if(squares[i*4+itemNum] === squares[(i+1)*4+itemNum]) { return false;}
+				}
+			}
+		}
+	}
+	keyboardHandler(); init();
+</script>
+</body>
+</html>
